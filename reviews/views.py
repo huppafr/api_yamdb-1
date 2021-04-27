@@ -33,7 +33,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         try:
-            instance = self.get_object()ПШЕ
+            instance = self.get_object()
             self.perform_destroy(instance)
         except Http404:
             return HttpResponse(status=404)
