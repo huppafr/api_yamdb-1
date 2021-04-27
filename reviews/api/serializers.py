@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from ..models import Review, Comment, Title, Ganre
+from ..models import Review, Comment, Title, Ganre, Category
 from django.db.models import Avg
 
 User = get_user_model()
@@ -33,7 +33,7 @@ class CommentsSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         fields = ('__all__')
-        model = Ganre
+        model = Category
 
 
 class GenreSerializer(serializers.ModelSerializer):

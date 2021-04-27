@@ -53,8 +53,8 @@ class Review(models.Model):
                               related_name='review'
                               )
 
-    text = models.TextField(verbose_name='Комментарий',
-                            help_text='Добавьте комментарий'
+    text = models.TextField(verbose_name='Review',
+                            help_text='Add review'
                             )
 
     author = models.ForeignKey(User,
