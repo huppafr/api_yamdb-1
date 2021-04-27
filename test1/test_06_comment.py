@@ -200,7 +200,7 @@ class Test06CommentAPI:
         response = client_moderator.delete(f'{pre_url}{comments[1]["id"]}/')
         assert response.status_code == 204, (
             'Проверьте, что при DELETE запросе `/api/v1/titles/{title_id}/reviews/{review_id}/comments/{comment_id}/` '
-            'возвращаете статус 204'+f'{response.status_code}'
+            'возвращаете статус 204'
         )
         response = user_client.get(f'{pre_url}')
         test_data = response.json()['results']

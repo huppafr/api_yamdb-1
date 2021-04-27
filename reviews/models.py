@@ -67,7 +67,7 @@ class Review(models.Model):
 
     score = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(10)],
-        help_text='Use the following range: <1-10')
+        help_text='Use the following range: <1-10>')
 
     def __str__(self):
         return self.text[:15]
