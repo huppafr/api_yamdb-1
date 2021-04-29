@@ -1,74 +1,68 @@
-from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, viewsets
 from rest_framework import serializers
-from django.http import HttpResponse, Http404
-from .models import Title, Comment, Review
-from .api.serializers import (
-    ReviewsSerializer, CommentsSerializer, TitleSerializer)
-from .api.permissions import IsAuthor
-User = get_user_model()
+from rest_framework.generics import get_object_or_404
+from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
+                                   ListModelMixin)
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.viewsets import GenericViewSet, ModelViewSet
+
+from reviews.api.permissions import IsAuthor
+from reviews.api.serializers import CommentsSerializer, ReviewsSerializer
+
+from .models import Review, Title
 
 
-class ReviewViewSet(viewsets.ModelViewSet):
+class CreateListDestroyViewSet(ListModelMixin,
+                               CreateModelMixin,
+                               DestroyModelMixin,
+                               GenericViewSet):
+    pass
 
+
+class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewsSerializer
     permission_classes = [
         IsAuthor,
-        permissions.IsAuthenticatedOrReadOnly,
+        IsAuthenticatedOrReadOnly,
     ]
+    pagination_class = PageNumberPagination
 
     def get_queryset(self):
-        return Review.objects.filter(title_id=self.kwargs['title_id'])
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
+        return title.reviews.all().order_by('id')
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs['title_id'])
         if self.request.method == 'POST':
-            if title.review.filter(author=self.request.user).exists():
+            if title.reviews.filter(author=self.request.user).exists():
                 raise serializers.ValidationError('Отзыв существует')
 
         serializer.save(
             author=self.request.user,
-            title=title)
-
-    def destroy(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            self.perform_destroy(instance)
-        except Http404:
-            return HttpResponse(status=404)
-        return HttpResponse(status=204)
+            title=title,
+        )
 
 
-class CommentsViewSet(viewsets.ModelViewSet):
-
+class CommentViewSet(ModelViewSet):
     serializer_class = CommentsSerializer
     permission_classes = [
         IsAuthor,
-        permissions.IsAuthenticatedOrReadOnly,
+        IsAuthenticatedOrReadOnly,
     ]
 
     def get_queryset(self):
-        return Comment.objects.filter(review_id=self.kwargs['review_id'])
+        title_id = self.kwargs.get('title_id')
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(
+            Review.objects.filter(title_id=title_id), pk=review_id
+        )
+        return review.comments.all()
 
     def perform_create(self, serializer):
-        serializer.save(
-            author=self.request.user,
-            review=get_object_or_404(Review, pk=self.kwargs['review_id']))
-
-    def destroy(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            self.perform_destroy(instance)
-        except Http404:
-            return HttpResponse(status=404)
-        return HttpResponse(status=204)
-
-
-class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
-    serializer_class = TitleSerializer
-    permission_classes = [
-        IsAuthor,
-        permissions.IsAuthenticatedOrReadOnly,
-    ]
+        title_id = self.kwargs.get('title_id')
+        review_id = self.kwargs.get('review_id')
+        review = get_object_or_404(
+            Review.objects.filter(title_id=title_id), pk=review_id
+        )
+        serializer.save(author=self.request.user, review=review)
