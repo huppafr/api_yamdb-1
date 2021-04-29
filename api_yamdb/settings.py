@@ -21,7 +21,9 @@ INSTALLED_APPS = [
     'titles',
     'django_filters',
     'rest_framework',
+    'reviews'
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
