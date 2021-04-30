@@ -3,10 +3,17 @@ from django.db import models
 from .generate_code import generate_confirmation_code
 
 
-class Roles(models.TextChoices):
-    USER = 'user'
-    MODERATOR = 'moderator'
-    ADMIN = 'admin'
+# class Roles(models.TextChoices):
+#     USER = 'user'
+#     MODERATOR = 'moderator'
+#     ADMIN = 'admin'
+
+
+ROLES = {
+    'USER': 'user',
+    'MODERATOR': 'moderator',
+    'ADMIN': 'admin',
+}
 
 
 class User(AbstractUser):
@@ -23,7 +30,8 @@ class User(AbstractUser):
     )
     role = models.CharField(
         max_length=50,
-        choices=Roles.choices,
+        choices=ROLES,
+        default=ROLES['USER'],
         verbose_name='Роль'
     )
     username = models.CharField(
@@ -44,8 +52,8 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.is_staff or self.role == Roles.ADMIN
+        return self.is_staff or self.role == ROLES['ADMIN']
 
     @property
     def is_moderator(self):
-        return self.role == Roles.MODERATOR
+        return self.role == ROLES['MODERATOR']
