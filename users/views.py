@@ -15,12 +15,12 @@ from .serializers import UserSerializer
 
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
+    serializer = UserSerializer
 
     def post(self, request):
-        email = request.data.get('email')
-        users = User.objects.all()
-        user = users.filter(email=email)
-        if len(user) > 0:
+        email = self.serializer(data=request.data.get('email'))
+        user = User.objects.filter(email=email).count()
+        if user > 0:
             confirmation_code = user[0].confirmation_code
         else:
             confirmation_code = generate_confirmation_code()
@@ -30,7 +30,7 @@ class RegisterView(APIView):
                 'confirmation_code': confirmation_code,
                 'username': f'{base_username}'
             }
-            serializer = UserSerializer(data=data)
+            serializer = self.serializer(data=data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
         send_mail_to_user(email, confirmation_code)
@@ -39,13 +39,16 @@ class RegisterView(APIView):
 
 class TokenView(APIView):
     permission_classes = (AllowAny,)
+    serializer = UserSerializer
 
     def get_token(self, user):
         refresh = RefreshToken.for_user(user)
         return str(refresh.access_token)
 
     def post(self, request):
-        user = get_object_or_404(User, email=request.data.get('email'))
+        email = self.serializer(data=request.data.get('email'))
+        email.is_valid(raise_exception=True)
+        user = get_object_or_404(User, email=email)
         if user.confirmation_code != request.data.get('confirmation_code'):
             response = {'confirmation_code': 'Неверный код'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)

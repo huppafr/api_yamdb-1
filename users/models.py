@@ -3,20 +3,17 @@ from django.db import models
 from .generate_code import generate_confirmation_code
 
 
-# class Roles(models.TextChoices):
-#     USER = 'user'
-#     MODERATOR = 'moderator'
-#     ADMIN = 'admin'
-
-
-ROLES = {
-    'USER': 'user',
-    'MODERATOR': 'moderator',
-    'ADMIN': 'admin',
-}
-
-
 class User(AbstractUser):
+    USER = 'user'
+    MODERATOR = 'moderator'
+    ADMIN = 'admin'
+
+    ROLES_CHOICES = [
+        (USER, 'user'),
+        (MODERATOR, 'moderator'),
+        (ADMIN, 'admin'),
+    ]
+
     bio = models.CharField(
         max_length=1000,
         null=True,
@@ -30,21 +27,13 @@ class User(AbstractUser):
     )
     role = models.CharField(
         max_length=50,
-        choices=ROLES,
-        default=ROLES['USER'],
+        choices=ROLES_CHOICES,
+        default=USER,
         verbose_name='Роль'
-    )
-    username = models.CharField(
-        max_length=30,
-        unique=True,
-        blank=False,
-        null=False
     )
     email = models.EmailField(
         max_length=255,
         unique=True,
-        blank=False,
-        null=False
     )
 
     USERNAME_FIELD = 'email'
@@ -52,8 +41,8 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.is_staff or self.role == ROLES['ADMIN']
+        return self.is_staff or self.role == self.ADMIN
 
     @property
     def is_moderator(self):
-        return self.role == ROLES['MODERATOR']
+        return self.role == self.MODERATOR
