@@ -1,17 +1,18 @@
 from rest_framework import serializers
+
 from titles.models import Category, Genre, Title
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ('name', 'slug')
+        exclude = ('id', )
         model = Category
         lookup_field = 'slug'
 
 
 class GenreSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = ('name', 'slug')
+        exclude = ('id', )
         model = Genre
         lookup_field = 'slug'
 
