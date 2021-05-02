@@ -1,10 +1,11 @@
+from django.conf import settings
 from rest_framework import serializers
 
 from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(default=User.USER)
+    role = serializers.CharField(default=settings.USER)
 
     class Meta:
         fields = (
