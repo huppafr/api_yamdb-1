@@ -1,17 +1,15 @@
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+
 from .generate_code import generate_confirmation_code
 
 
 class User(AbstractUser):
-    USER = 'user'
-    MODERATOR = 'moderator'
-    ADMIN = 'admin'
-
     ROLES_CHOICES = [
-        (USER, 'user'),
-        (MODERATOR, 'moderator'),
-        (ADMIN, 'admin'),
+        (settings.USER, 'user'),
+        (settings.MODERATOR, 'moderator'),
+        (settings.ADMIN, 'admin'),
     ]
 
     bio = models.CharField(
@@ -28,7 +26,7 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=50,
         choices=ROLES_CHOICES,
-        default=USER,
+        default=settings.USER,
         verbose_name='Роль'
     )
     email = models.EmailField(
@@ -41,8 +39,8 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.is_staff or self.role == self.ADMIN
+        return self.is_staff or self.role == settings.ADMIN
 
     @property
     def is_moderator(self):
-        return self.role == self.MODERATOR
+        return self.role == settings.MODERATOR
