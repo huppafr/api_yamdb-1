@@ -7,17 +7,10 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 
-from reviews.api.permissions import IsAuthor
-from reviews.api.serializers import CommentsSerializer, ReviewsSerializer
+from reviews.permissions import IsAuthor
+from reviews.serializers import CommentsSerializer, ReviewsSerializer
 
 from .models import Review, Title
-
-
-class CreateListDestroyViewSet(ListModelMixin,
-                               CreateModelMixin,
-                               DestroyModelMixin,
-                               GenericViewSet):
-    pass
 
 
 class ReviewViewSet(ModelViewSet):
