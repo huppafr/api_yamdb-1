@@ -15,6 +15,7 @@ class ReviewsSerializer(serializers.ModelSerializer):
         model = Review
 
     def validate(self, data):
+
         rq = self.context['request']
         current_title = get_object_or_404(
             Title, pk=rq.parser_context['kwargs'].get('title_id'))
