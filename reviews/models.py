@@ -1,5 +1,6 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
 from titles.models import Title
 from users.models import User
 
@@ -16,8 +17,8 @@ class Review(models.Model):
         verbose_name='Оценка',
         default=1,
         validators=[
-            MinValueValidator(1),
-            MaxValueValidator(10)
+            MinValueValidator(1, message='Минимальная оценка 1'),
+            MaxValueValidator(10, message='Максимальная оценка 10')
         ],
         blank=False,
         null=False
@@ -36,6 +37,7 @@ class Review(models.Model):
     class Meta:
         verbose_name = 'Отзыв'
         verbose_name_plural = 'Отзывы'
+        ordering = ['-pub_date']
 
     def __str__(self):
         return f'Отзыв от {self.author} на {self.title}'

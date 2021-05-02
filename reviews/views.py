@@ -1,31 +1,17 @@
 from django.shortcuts import get_object_or_404
-from rest_framework import serializers
 from rest_framework.generics import get_object_or_404
-from rest_framework.mixins import (CreateModelMixin, DestroyModelMixin,
-                                   ListModelMixin)
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
-
-from reviews.api.permissions import IsAuthor
-from reviews.api.serializers import CommentsSerializer, ReviewsSerializer
+from rest_framework.viewsets import ModelViewSet
 
 from .models import Review, Title
-
-
-class CreateListDestroyViewSet(ListModelMixin,
-                               CreateModelMixin,
-                               DestroyModelMixin,
-                               GenericViewSet):
-    pass
+from .permissions import IsAuthor
+from .serializers import CommentsSerializer, ReviewsSerializer
 
 
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewsSerializer
-    permission_classes = [
-        IsAuthor,
-        IsAuthenticatedOrReadOnly,
-    ]
+    permission_classes = [IsAuthor, IsAuthenticatedOrReadOnly]
     pagination_class = PageNumberPagination
 
     def get_queryset(self):
@@ -34,10 +20,6 @@ class ReviewViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         title = get_object_or_404(Title, pk=self.kwargs['title_id'])
-        if self.request.method == 'POST':
-            if title.reviews.filter(author=self.request.user).exists():
-                raise serializers.ValidationError('Отзыв существует')
-
         serializer.save(
             author=self.request.user,
             title=title,

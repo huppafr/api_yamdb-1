@@ -1,11 +1,10 @@
 from rest_framework import serializers
 
-from .models import ROLES, User
+from .models import User
 
 
 class UserSerializer(serializers.ModelSerializer):
-    roles = ROLES
-    role = serializers.CharField(default=ROLES['USER'])
+    role = serializers.CharField(default=User.USER)
 
     class Meta:
         fields = (
