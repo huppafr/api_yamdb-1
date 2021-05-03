@@ -1,7 +1,6 @@
-from datetime import datetime
-
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
+from .validators import year_validator
 
 
 class Category(models.Model):
@@ -32,10 +31,12 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(max_length=200, verbose_name='Произведение')
-    year = models.PositiveIntegerField(
-        validators=[MinValueValidator(1900),
-                    MaxValueValidator(datetime.now().year)],
-        null=True, verbose_name='Год издания', db_index=True)
+    year = models.PositiveSmallIntegerField(
+        validators=[year_validator],
+        verbose_name='Год издания',
+        null=True,
+        db_index=True,
+    )
     description = models.CharField(max_length=200, null=True)
     genre = models.ManyToManyField(Genre, blank=True, related_name='titles')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL,
