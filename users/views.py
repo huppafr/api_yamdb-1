@@ -18,8 +18,10 @@ class RegisterView(APIView):
     serializer = UserSerializer
 
     def post(self, request):
-        email = self.serializer(data=request.data.get('email'))
-        user = User.objects.filter(email=email).count()
+        validate = self.serializer(data=request.data)
+        validate.is_valid(raise_exception=True)
+        email = request.data.get['email']
+        user = User.objects.first(email).count()
         if user > 0:
             confirmation_code = user[0].confirmation_code
         else:
@@ -46,8 +48,9 @@ class TokenView(APIView):
         return str(refresh.access_token)
 
     def post(self, request):
-        email = self.serializer(data=request.data.get('email'))
-        email.is_valid(raise_exception=True)
+        validate = self.serializer(data=request.data)
+        validate.is_valid(raise_exception=True)
+        email = request.data.get['email']
         user = get_object_or_404(User, email=email)
         if user.confirmation_code != request.data.get('confirmation_code'):
             response = {'confirmation_code': 'Неверный код'}
