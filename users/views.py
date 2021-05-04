@@ -20,8 +20,8 @@ class RegisterView(APIView):
     def post(self, request):
         validate = self.serializer(data=request.data)
         validate.is_valid(raise_exception=True)
-        email = request.data.get['email']
-        user = User.objects.first(email).count()
+        email = validate.validated_data('email')
+        user = User.objects.order_by('email').first()
         if user > 0:
             confirmation_code = user[0].confirmation_code
         else:
@@ -50,9 +50,10 @@ class TokenView(APIView):
     def post(self, request):
         validate = self.serializer(data=request.data)
         validate.is_valid(raise_exception=True)
-        email = request.data.get['email']
+        email = validate.validated_data('email')
         user = get_object_or_404(User, email=email)
-        if user.confirmation_code != request.data.get('confirmation_code'):
+        code = validate.validated_data('confirmation_code')
+        if user.confirmation_code != code:
             response = {'confirmation_code': 'Неверный код'}
             return Response(response, status=status.HTTP_400_BAD_REQUEST)
         response = {'token': self.get_token(user)}
