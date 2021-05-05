@@ -9,8 +9,8 @@ def generate_confirmation_code():
 
 def send_mail_to_user(email, confirmation_code):
     send_mail(
-        message='Спасибо за регистрацию.'
-                f'Код подтверждения: {confirmation_code}',
+        'Спасибо за регистрацию.',
+        f'Код подтверждения: {confirmation_code}',
         from_email=settings.EMAIL,
         recipient_list=[email],
         fail_silently=False,

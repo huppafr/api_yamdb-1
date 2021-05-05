@@ -18,7 +18,7 @@ class User(AbstractUser):
         verbose_name='Биография'
     )
     confirmation_code = models.CharField(
-        max_length=10,
+        max_length=100,
         null=True,
         verbose_name='Код подтверждения',
         default=generate_confirmation_code()
@@ -36,7 +36,6 @@ class User(AbstractUser):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ('username',)
-
     @property
     def is_admin(self):
         return self.is_staff or self.role == settings.ADMIN

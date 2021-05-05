@@ -10,26 +10,27 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .generate_code import generate_confirmation_code, send_mail_to_user
 from .models import User
 from .permissions import IsAdmin, IsSuperuser
-from .serializers import UserSerializer
+from .serializers import UserSerializer, EmailSerializer
 
 
 class RegisterView(APIView):
     permission_classes = (AllowAny,)
     serializer = UserSerializer
+    email_serializer = EmailSerializer
 
     def post(self, request):
-        validate = self.serializer(data=request.data)
+        validate = self.email_serializer(data=request.data)
         validate.is_valid(raise_exception=True)
-        email = validate.validated_data('email')
-        user = User.objects.order_by('email').first()
-        if user > 0:
-            confirmation_code = user[0].confirmation_code
+        email = validate.validated_data['email']
+        user = User.objects.filter(email=email).first()
+        if user is not None:
+            confirmation_code = user.confirmation_code
         else:
             confirmation_code = generate_confirmation_code()
             base_username = email.split('@')[0]
             data = {
                 'email': email,
-                'confirmation_code': confirmation_code,
+                'confirmation_code': f'{confirmation_code}',
                 'username': f'{base_username}'
             }
             serializer = self.serializer(data=data)

@@ -4,8 +4,18 @@ from rest_framework import serializers
 from .models import User
 
 
+class EmailSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
+
+    class Meta:
+        fields = (
+            'email',
+        )
+        model = User
+
+
 class UserSerializer(serializers.ModelSerializer):
-    role = serializers.CharField(default=settings.USER)
+    role = serializers.CharField(default=settings.USER),
 
     class Meta:
         fields = (
@@ -20,6 +30,5 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         extra_kwargs = {
             'confirmation_code': {'write_only': True},
-            'username': {'required': True},
             'email': {'required': True},
         }
