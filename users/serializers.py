@@ -14,6 +14,16 @@ class EmailSerializer(serializers.ModelSerializer):
         model = User
 
 
+class CodeSerializer(serializers.ModelSerializer):
+    confirmation_code = serializers.CharField()
+
+    class Meta:
+        fields = (
+            'confirmation_code',
+        )
+        model = User
+
+
 class UserSerializer(serializers.ModelSerializer):
     role = serializers.CharField(default=settings.USER),
 
